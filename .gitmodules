@@ -1,0 +1,3 @@
+[submodule "messenger-app-client-side"]
+	path = messenger-app-client-side
+	url = https://github.com/PodshyvalovaRuslana/messenger-app-client-side.git
