@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  server:
+    container_name: messenger-app-server-side
+    restart: always
+    build: .
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    depends_on:
+      - db
+    volumes:
+      - .:/src/app
+
+  client:
+    container_name: messenger-app-client-side
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile
+      context: ./messenger-app-client-side/
+    volumes:
+      - /app/node_modules
+      - ./messenger-app-client-side:/app
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}
+
+  db:
+    container_name: postgres
+    image: postgres
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - data:/data/db
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+  pgadmin:
+    image: dpage/pgadmin4:4.18
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_LISTEN_PORT: ${PGADMIN_PORT}
+    ports:
+      - ${PGADMIN_PORT}:${PGADMIN_PORT}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - "db:pgsql-server"
+
+volumes: 
+  data: {}
+  pgadmin-data:
